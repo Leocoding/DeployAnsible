@@ -1,0 +1,17 @@
+---
+- hosts: pcs
+  connection: local
+  gather_facts: no
+  become: yes
+  vars:
+  - interface: lxcbr0 
+  roles:
+    - lxc
+- hosts: pcs
+  gather_facts: no
+  become: yes
+  roles:
+    - apache
+    - mysql
+    - wordpress
+...

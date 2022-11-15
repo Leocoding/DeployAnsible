@@ -1,0 +1,18 @@
+---
+- name: Installation Apache
+  apt:
+    name: apache2
+    state: latest
+    update-cache: yes
+- name: Copy Config file
+  copy: src="wordpress.conf" dest="/etc/apache2/sites-available/wordpress.conf"
+- name: Config service
+  shell: |
+    a2ensite wordpress
+    a2enmod rewrite
+    a2dissite 000-default
+    service apache2 reload
+- name: start_apache2
+  service:
+    name: apache2
+    state: started

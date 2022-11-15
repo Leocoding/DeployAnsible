@@ -1,0 +1,28 @@
+---
+- name: Install MySQL
+  apt:
+    pkg:
+      - mysql-server
+      - mysql-client
+      - python3-mysqldb
+- name: Start and enable mysql
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+- name: Create MySQL DataBase
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+- name: Create MySQL User
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: '*.*:ALL'
+    host: 'localhost'
+    state: present
+- name: restart_mysql
+  service:
+    name: mysql
+    state: restarted
+    enabled: yes

@@ -1,0 +1,49 @@
+---
+#tasks file for lxc
+- name: Setup environment
+  delegate_to: localhost
+  ansible.builtin.apt:
+    pkg:
+      - lxc
+      - python3
+      - lxc-dev
+      - python3-lxc 
+      - lxctl
+      - lxc-templates
+      - sshpass
+- name: Containers creation
+  delegate_to: localhost
+  community.general.lxc_container:
+    name: "{{ inventory_hostname }}"
+    fs_size: 300M
+    template: ubuntu
+    template_options: --release jammy
+    state: stopped
+    container_config:
+      - "lxc.net.0.link = {{ interface }}"        
+      - "lxc.net.0.ipv4.address = {{ ansible_host }}/24"
+      - "lxc.net.0.ipv4.gateway = auto"
+- name : Copy netplan file
+  copy:
+    src: 10-net-config.yaml
+    dest: /var/lib/lxc/{{ inventory_hostname }}/rootfs/etc/netplan/10-net-config.yaml
+- name : Copy DNS config file
+  copy:
+    src: resolv.conf
+    dest: /var/lib/lxc/{{ inventory_hostname }}/rootfs/etc/resolv.conf
+- name : Copy sudoer file
+  copy:
+    src: 10-ansible
+    dest: /var/lib/lxc/{{ inventory_hostname }}/rootfs/etc/sudoers.d/10-ansible
+- name: Start containers
+  community.general.lxc_container:
+    name: "{{ inventory_hostname }}"
+    state: started
+    container_command: |
+      mkdir /home/ansible
+      chown ansible:ansible /home/ansible
+      useradd ansible -d /home/ansible
+      echo "ansible:password" | chpasswd
+      ssh-copy-id -i {{ ansible_ssh_private_key_file }} {{ ansible_user }}@{{ ansible_host }}
+      apt-get update --fix-missing
+      

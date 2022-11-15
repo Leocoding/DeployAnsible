@@ -1,0 +1,34 @@
+---
+# tasks file for wordpress
+
+- name: Install Wordpress Dependancies
+  ansible.builtin.apt:
+    pkg:
+      - ghostscript
+      - libapache2-mod-php
+      - php
+      - php-bcmath
+      - php-curl
+      - php-imagick
+      - php-intl
+      - php-json
+      - php-mbstring
+      - php-mysql
+      - php-xml
+      - php-zip
+      - curl
+- name: Create Wordpress Directory
+  command: "mkdir -p /srv/www"
+- name: Give rights to www-data
+  command: "chown www-data: /srv/www"
+- name: Get Wordpress Zip
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz 
+    dest: /srv/www/
+    remote_src: yes
+- name: Config Wordpress
+  copy: src="wp-config.php" dest="/srv/www/wordpress/wp-config.php"
+- name : Restart Apache2 after Config
+  service:
+    name: apache2
+    state: restarted

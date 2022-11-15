@@ -1,0 +1,11 @@
+---
+# tasks file for lxc
+- hosts: pcs
+  connection: local
+  gather_facts: false
+  become: true
+  tasks:
+  - name: Delete containers
+    community.general.lxc_container:
+      name: "{{ inventory_hostname }}"
+      state: absent
