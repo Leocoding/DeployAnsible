@@ -1,8 +1,8 @@
 #!/bin/sh
 
 echo "Start script"
-ssh-keygen -R 10.0.3.2
-ssh-keygen -R 10.0.3.3
-ssh-keygen -R 10.0.3.4
-ssh-keygen -R 10.0.3.5
+for i in 2 3 4 5 6
+do
+ssh-keygen -R 10.0.3.$i
+done
 echo "Script finised"
